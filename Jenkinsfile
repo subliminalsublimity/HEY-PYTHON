@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('SCM Checkout'){
             steps {
-                git 'https://github.com/subliminalsublimity/HEY-PYTHON.git'
+                git branch: 'main' , url:'https://github.com/subliminalsublimity/HEY-PYTHON.git'
             }
         }
 
