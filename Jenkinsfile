@@ -2,7 +2,9 @@ pipeline {
     agent any 
     environment {
         DOCKERHUB_CREDENTIALS = credentials('DockerHubCredentials')
+        IMAGE_NAME = 'dakshgaur10/git-pipeline'
     }
+
     stages {
         stage('SCM Checkout'){
             steps {
@@ -12,20 +14,44 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-              sh "docker build -t  python2:$BUILD_NUMBER ."
+                script {
+              sh "docker build -t ${IMAGE_NAME}:$BUILD_NUMBER ."
+                }
             }
         }
 
         stage('Login to DockerHub') {
             steps {
-               sh 'echo "$DOCKERHUB_CREDENTIALS_PSW" | docker login -u "$DOCKERHUB_CREDENTIALS_USR" --password-stdin'
+                script{
+               sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u "$DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                }
             }
         }
+
         stage('Push Docker Image') {
             steps {
-                sh "docker push python2:$BUILD_NUMBER"
+                script {
+                sh "docker push ${IMAGE_NAME}:${BUILD_NUMBER}"
             }
         }
-        
     }
+
+    stage('Run Docker Container'){
+        steps {
+            script {
+                sh 'docker rm python2-container --force || true'
+                sh "docker run --name python2-container -p 8085:80 -d ${IMAGE_NAME}:${BUILD_NUMBER}"
+            }
+        }
+    }
+}
+
+
+post {
+    always {
+        script {
+            sh 'docker logout'
+        }
+    }
+}
 }
