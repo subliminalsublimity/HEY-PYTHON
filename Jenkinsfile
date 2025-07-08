@@ -12,18 +12,18 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                docker build -t  python2:$BUILD_NUMBER .
+              sh "docker build -t  python2:$BUILD_NUMBER ."
             }
         }
 
         stage('Login to DockerHub') {
             steps {
-               sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+               sh 'echo "$DOCKERHUB_CREDENTIALS_PSW" | docker login -u "$DOCKERHUB_CREDENTIALS_USR" --password-stdin'
             }
         }
         stage('Push Docker Image') {
             steps {
-                'docker push python2:$BUILD_NUMBER'
+                sh "docker push python2:$BUILD_NUMBER"
             }
         }
         
